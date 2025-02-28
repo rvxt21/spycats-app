@@ -1,5 +1,7 @@
 package models
 
+import "strings"
+
 type SpyCat struct {
 	ID                uint    `json:"id,omitempty" gorm:"primaryKey"`
 	Name              string  `json:"name" binding:"required" gorm:"size:255;not null"`
@@ -19,12 +21,13 @@ type Mission struct {
 }
 
 func (m *Mission) CheckTargetsUnique() bool {
-	targetNames := make(map[string]bool)
+	targetNames := make(map[string]struct{})
 	for _, target := range m.Targets {
-		if _, exists := targetNames[target.Name]; exists {
+		identifier := strings.ToLower(target.Name) + "-" + strings.ToLower(target.Country)
+		if _, exists := targetNames[identifier]; exists {
 			return false
 		}
-		targetNames[target.Name] = true
+		targetNames[identifier] = struct{}{}
 	}
 	return true
 }
