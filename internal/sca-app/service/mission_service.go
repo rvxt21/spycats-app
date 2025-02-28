@@ -63,3 +63,13 @@ func (s *MissionService) GetMission(id uint) (*models.Mission, error) {
 	}
 	return mission, nil
 }
+
+func (s *MissionService) AssignCatToMission(missionId, catId uint) error {
+	if err := s.st.SetCat(missionId, catId); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+

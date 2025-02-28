@@ -31,7 +31,7 @@ func (s *MissionStorage) DeleteMission(id uint) error {
 		return fmt.Errorf("mission with ID %d not found: %w", id, err)
 	}
 
-	if mission.CatID != 0 {
+	if mission.CatID != nil {
 		return fmt.Errorf("failed to delete mission, mission already assigned to a cat")
 	}
 
@@ -63,3 +63,29 @@ func (s *MissionStorage) GetMission(id uint) (*models.Mission, error) {
 	}
 	return &mission, nil
 }
+
+func (s *MissionStorage) SetCat(missionId, catId uint) error {
+	var mission models.Mission
+	if err := s.db.First(&mission, missionId).Error; err != nil {
+		return fmt.Errorf("mission with ID %d not found: %v", missionId, err)
+	}
+
+	var existingMission models.Mission
+	if err := s.db.Where("cat_id = ?", catId).First(&existingMission).Error; err == nil {
+		return fmt.Errorf("cat with ID %d is already assigned to a mission", catId)
+	}
+
+	var cat models.SpyCat
+	if err := s.db.First(&cat, catId).Error; err != nil {
+		return fmt.Errorf("cat with ID %d not found: %v", catId, err)
+	}
+
+	mission.CatID = &catId
+
+	if err := s.db.Save(&mission).Error; err != nil {
+		return fmt.Errorf("failed to update mission with ID %d: %v", missionId, err)
+	}
+
+	return nil
+}
+

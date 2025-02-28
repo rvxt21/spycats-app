@@ -47,7 +47,7 @@ func (h *MissionHandler) DeleteMission(c *gin.Context) {
 }
 
 type UpdateMissionStatusReqBody struct {
-	isCompleted bool `json:"is_complited"`
+	IsCompleted bool `json:"is_complited"`
 }
 
 func (h *MissionHandler) UpdateMissionStatus(c *gin.Context) {
@@ -59,7 +59,7 @@ func (h *MissionHandler) UpdateMissionStatus(c *gin.Context) {
 		return
 	}
 
-	if err := h.s.UpdateMissionStatus(id, req.isCompleted); err != nil {
+	if err := h.s.UpdateMissionStatus(id, req.IsCompleted); err != nil {
 		log.Error().Err(err).Msg("Failed to update mission status")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -91,4 +91,37 @@ func (h *MissionHandler) GetMission(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, cat)
+}
+
+type AssignCatForMission struct {
+	CatId uint `json:"cat_id"`
+}
+
+func (h *MissionHandler) SetCatForMission(c *gin.Context) {
+	id := c.Value("id").(uint)
+
+	var req AssignCatForMission
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	if req.CatId == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid cat ID"})
+		return
+	}
+
+	if err := h.s.AssignCatToMission(id, req.CatId); err != nil {
+		log.Error().Err(err).Msg("Failed to assign spy cat to mission")
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, "Cat assigned to a mission")
+}
+
+type AddTargetToMissionReq struct {
+	Name    string `json:"name"`
+	Country string `json:"country"`
 }

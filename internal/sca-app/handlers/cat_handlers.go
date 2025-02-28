@@ -5,17 +5,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	catapi "github.com/rvxt21/sca-agency/external/cat_api"
 	"github.com/rvxt21/sca-agency/internal/sca-app/models"
 	"github.com/rvxt21/sca-agency/internal/sca-app/service"
 )
 
 type CatHandler struct {
-	s service.Service
+	s        service.Service
+	breedAPI *catapi.BreedAPIChecker
 }
 
-func New(s service.Service) *CatHandler {
+func New(s service.Service, b *catapi.BreedAPIChecker) *CatHandler {
 	return &CatHandler{
-		s: s,
+		s:        s,
+		breedAPI: b,
 	}
 }
 
@@ -24,6 +27,11 @@ func (h *CatHandler) CreateSpyCat(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&cat); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	if !h.breedAPI.CheckIfBreedExists(cat.Breed) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Breed is not valid"})
 		return
 	}
 

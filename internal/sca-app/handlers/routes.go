@@ -24,7 +24,14 @@ func (h *MissionHandler) RegisterRoutesM(router *gin.Engine) {
 	missionGroup.GET("/", h.GetAllMissions)
 
 	missionGroup.DELETE("/:id", middlewares.IdMiddleware(), h.DeleteMission)
-	missionGroup.PATCH("/:id", middlewares.IdMiddleware(), h.UpdateMissionStatus)
+	missionGroup.PATCH("/:id/updatestatus", middlewares.IdMiddleware(), h.UpdateMissionStatus)
+	missionGroup.PATCH("/:id/assigncat", middlewares.IdMiddleware(), h.SetCatForMission)
 	missionGroup.GET("/:id", middlewares.IdMiddleware(), h.GetMission)
 
+}
+
+func (h *TargetsHandler) RegisterRoutesT(router *gin.Engine) {
+	targetGroup := router.Group("/targets")
+	targetGroup.POST("/", middlewares.IdMiddleware(), h.AddTargetToMission)
+	targetGroup.DELETE("/", middlewares.IdMiddleware(), h.DeleteTarget)
 }
