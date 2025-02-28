@@ -1,4 +1,4 @@
-package middleware
+package middlewares
 
 import (
 	"net/http"
@@ -18,14 +18,14 @@ func IdMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		id, err := strconv.Atoi(idStr)
+		id, err := strconv.ParseUint(idStr, 10, 32)
 		if err != nil {
 			log.Warn().Err(err).Msg("Invalid ID param")
 			c.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
 
-		c.Set("id", id)
+		c.Set("id", uint(id))
 
 		c.Next()
 	}

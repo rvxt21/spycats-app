@@ -12,6 +12,11 @@ import (
 )
 
 type Storage interface {
+	CreateSpyCat(spyCat *models.SpyCat) error
+	DeleteSpyCat(id uint) error
+	UpdateSalary(id uint, newSalary float64) error
+	GetAllSpyCats() ([]models.SpyCat, error)
+	GetSpyCat(id uint) (*models.SpyCat, error)
 }
 
 type PostgreStorage struct {
@@ -19,7 +24,7 @@ type PostgreStorage struct {
 	// m     sync.Mutex
 }
 
-func New(connStr string) (*PostgreStorage, error) {
+func New(connStr string) (Storage, error) {
 	db, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("opening database: %w", err)
@@ -41,24 +46,4 @@ func New(connStr string) (*PostgreStorage, error) {
 	return &PostgreStorage{
 		DB: db,
 	}, nil
-}
-
-func (s *PostgreStorage) CreateSpyCat() {
-
-}
-
-func (s *PostgreStorage) DeleteSpyCat() {
-
-}
-
-func (s *PostgreStorage) UpdateSalary() {
-
-}
-
-func (s *PostgreStorage) GetAllSpyCats() {
-
-}
-
-func (s *PostgreStorage) GetSpyCat() {
-
 }
