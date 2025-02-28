@@ -37,5 +37,5 @@ type Target struct {
 	Notes       string `gorm:"type:text"`
 	IsCompleted bool   `gorm:"default:false"`
 
-	Mission Mission `gorm:"foreignKey:MissionID"`
+	Mission Mission `gorm:"foreignKey:MissionID" json:"-"`
 }

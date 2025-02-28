@@ -32,3 +32,34 @@ func (s *MissionService) CreateMission(m *models.Mission) error {
 	}
 	return nil
 }
+
+func (s *MissionService) DeleteMission(id uint) error {
+	if err := s.st.DeleteMission(id); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *MissionService) UpdateMissionStatus(id uint, isCompleted bool) error {
+	if err := s.st.UpdateMissionStatus(id, isCompleted); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *MissionService) GetAllMissions() ([]models.Mission, error) {
+	missions, err := s.st.GetAllMissions()
+	if err != nil {
+		return nil, err
+	}
+	return missions, nil
+
+}
+
+func (s *MissionService) GetMission(id uint) (*models.Mission, error) {
+	mission, err := s.st.GetMission(id)
+	if err != nil {
+		return nil, fmt.Errorf("service: failed to get mission with ID %d: %w", id, err)
+	}
+	return mission, nil
+}
