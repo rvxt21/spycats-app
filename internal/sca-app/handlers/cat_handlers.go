@@ -37,7 +37,7 @@ func (h *CatHandler) CreateSpyCat(c *gin.Context) {
 
 	if err := h.s.CreateSpyCat(&cat); err != nil {
 		log.Error().Err(err).Msg("Failed to create spy cat")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create spy cat"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -57,7 +57,7 @@ func (h *CatHandler) DeleteSpyCat(c *gin.Context) {
 }
 
 type UpdateSalaryReq struct {
-	salary float64 `json:"salary"`
+	Salary float64 `json:"salary"`
 }
 
 func (h *CatHandler) UpdateSpyCat(c *gin.Context) {
@@ -70,7 +70,7 @@ func (h *CatHandler) UpdateSpyCat(c *gin.Context) {
 		return
 	}
 
-	if err := h.s.UpdateSalary(id, req.salary); err != nil {
+	if err := h.s.UpdateSalary(id, req.Salary); err != nil {
 		log.Error().Err(err).Msg("Failed to update salary")
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update salary"})
 		return
