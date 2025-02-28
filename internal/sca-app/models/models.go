@@ -1,7 +1,9 @@
 package models
 
+import "strings"
+
 type SpyCat struct {
-	ID                uint    `json:"id" binding:"required" gorm:"primaryKey"`
+	ID                uint    `json:"id,omitempty" gorm:"primaryKey"`
 	Name              string  `json:"name" binding:"required" gorm:"size:255;not null"`
 	YearsOfExperience float64 `json:"years_of_experience" binding:"required" gorm:"type:decimal(5,2);not null"`
 	Breed             string  `json:"breed" binding:"required" gorm:"size:255;not null"`
@@ -11,11 +13,23 @@ type SpyCat struct {
 }
 
 type Mission struct {
-	ID          uint `gorm:"primaryKey"`
-	CatID       uint `gorm:"uniqueIndex"`
-	IsCompleted bool `gorm:"default:false"`
+	ID          uint  `gorm:"primaryKey"`
+	CatID       *uint `json:"cat_id" gorm:"index"`
+	IsCompleted bool  `gorm:"default:false"`
 
 	Targets []Target `gorm:"foreignKey:MissionID"`
+}
+
+func (m *Mission) CheckTargetsUnique() bool {
+	targetNames := make(map[string]struct{})
+	for _, target := range m.Targets {
+		identifier := strings.ToLower(target.Name) + "-" + strings.ToLower(target.Country)
+		if _, exists := targetNames[identifier]; exists {
+			return false
+		}
+		targetNames[identifier] = struct{}{}
+	}
+	return true
 }
 
 type Target struct {
@@ -26,5 +40,5 @@ type Target struct {
 	Notes       string `gorm:"type:text"`
 	IsCompleted bool   `gorm:"default:false"`
 
-	Mission Mission `gorm:"foreignKey:MissionID"`
+	Mission Mission `gorm:"foreignKey:MissionID" json:"-"`
 }

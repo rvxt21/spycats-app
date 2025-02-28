@@ -5,25 +5,33 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	catapi "github.com/rvxt21/sca-agency/external/cat_api"
 	"github.com/rvxt21/sca-agency/internal/sca-app/models"
 	"github.com/rvxt21/sca-agency/internal/sca-app/service"
 )
 
-type Handler struct {
-	s service.Service
+type CatHandler struct {
+	s        service.Service
+	breedAPI *catapi.BreedAPIChecker
 }
 
-func New(s service.Service) *Handler {
-	return &Handler{
-		s: s,
+func New(s service.Service, b *catapi.BreedAPIChecker) *CatHandler {
+	return &CatHandler{
+		s:        s,
+		breedAPI: b,
 	}
 }
 
-func (h *Handler) CreateSpyCat(c *gin.Context) {
+func (h *CatHandler) CreateSpyCat(c *gin.Context) {
 	var cat models.SpyCat
 
 	if err := c.ShouldBindJSON(&cat); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	if !h.breedAPI.CheckIfBreedExists(cat.Breed) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Breed is not valid"})
 		return
 	}
 
@@ -36,7 +44,7 @@ func (h *Handler) CreateSpyCat(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Spy cat created successfully"})
 }
 
-func (h *Handler) DeleteSpyCat(c *gin.Context) {
+func (h *CatHandler) DeleteSpyCat(c *gin.Context) {
 	id := c.Value("id").(uint)
 
 	if err := h.s.DeleteSpyCat(id); err != nil {
@@ -52,7 +60,7 @@ type UpdateSalaryReq struct {
 	salary float64 `json:"salary"`
 }
 
-func (h *Handler) UpdateSpyCat(c *gin.Context) {
+func (h *CatHandler) UpdateSpyCat(c *gin.Context) {
 	var req UpdateSalaryReq
 
 	id := c.Value("id").(uint)
@@ -72,7 +80,7 @@ func (h *Handler) UpdateSpyCat(c *gin.Context) {
 
 }
 
-func (h *Handler) GetAllSpyCats(c *gin.Context) {
+func (h *CatHandler) GetAllSpyCats(c *gin.Context) {
 	cats, err := h.s.GetAllSpyCats()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to retrieve all spy cats")
@@ -83,13 +91,13 @@ func (h *Handler) GetAllSpyCats(c *gin.Context) {
 	c.JSON(http.StatusOK, cats)
 }
 
-func (h *Handler) GetSpyCatById(c *gin.Context) {
+func (h *CatHandler) GetSpyCatById(c *gin.Context) {
 	id := c.Value("id").(uint)
 
 	cat, err := h.s.GetSpyCat(id)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to retrieve spy cat by ID")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve spy cat"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
