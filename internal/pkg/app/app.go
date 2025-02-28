@@ -1,6 +1,8 @@
 package app
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"github.com/rvxt21/sca-agency/internal/sca-app/handlers"
@@ -15,7 +17,12 @@ type App struct {
 }
 
 func New() (*App, error) {
-	connStr := "host=database user=TemporaryMainuser password=TemporaryPasw dbname=scaApp port=5432 sslmode=disable"
+
+	connStr := os.Getenv("POSTGRES_CONN_STR")
+	if connStr == "" {
+		log.Fatal().Msg("POSTGRES_CONN_STR not set in .env file")
+	}
+
 	a := &App{}
 	st, err := storage.New(connStr)
 	if err != nil {

@@ -2,7 +2,7 @@ services:
   api:
     build: .
     environment:
-      POSTGRES_CONN_STR: "postgres://TemporaryMainuser:TemporaryPasw@database:5432/scaApp?sslmode=disable"
+      POSTGRES_CONN_STR: ${POSTGRES_CONN_STR}
     depends_on:
       - database
     ports:
@@ -11,9 +11,9 @@ services:
   database:
     image: postgres
     environment:
-      POSTGRES_DB: scaApp
-      POSTGRES_USER: TemporaryMainuser
-      POSTGRES_PASSWORD: TemporaryPasw
+      POSTGRES_DB:  ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
