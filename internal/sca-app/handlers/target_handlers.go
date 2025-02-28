@@ -37,8 +37,10 @@ func (h *TargetsHandler) AddTargetToMission(c *gin.Context) {
 	}
 
 	if err := h.s.AddTargetToMission(id, &target); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	c.JSON(http.StatusAccepted, "Target added")
 }
 
 type DeleteTargetReq struct {

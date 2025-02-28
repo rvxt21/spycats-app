@@ -8,6 +8,7 @@ import (
 func (h *CatHandler) RegisterRoutes(router *gin.Engine) {
 
 	spyCatGroup := router.Group("/spycats")
+	spyCatGroup.Use(middlewares.LogMiddleware())
 	{
 		spyCatGroup.POST("/", h.CreateSpyCat)
 		spyCatGroup.GET("/", h.GetAllSpyCats)
@@ -20,6 +21,8 @@ func (h *CatHandler) RegisterRoutes(router *gin.Engine) {
 
 func (h *MissionHandler) RegisterRoutesM(router *gin.Engine) {
 	missionGroup := router.Group("/missions")
+
+	missionGroup.Use(middlewares.LogMiddleware())
 	missionGroup.POST("/", h.CreateMission)
 	missionGroup.GET("/", h.GetAllMissions)
 
@@ -32,6 +35,7 @@ func (h *MissionHandler) RegisterRoutesM(router *gin.Engine) {
 
 func (h *TargetsHandler) RegisterRoutesT(router *gin.Engine) {
 	targetGroup := router.Group("/missions/:id/targets")
+	targetGroup.Use(middlewares.LogMiddleware())
 	targetGroup.POST("/", middlewares.IdMiddleware(), h.AddTargetToMission)
 	targetGroup.DELETE("/deletetarget", middlewares.IdMiddleware(), h.DeleteTarget)
 	targetGroup.PATCH("/updatenotes", middlewares.IdMiddleware(), h.UpdateNotes)
