@@ -5,15 +5,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
+	"github.com/rvxt21/sca-agency/internal/database"
 	"github.com/rvxt21/sca-agency/internal/sca-app/handlers"
 	"github.com/rvxt21/sca-agency/internal/sca-app/service"
 	"github.com/rvxt21/sca-agency/internal/sca-app/storage"
 )
 
 type App struct {
-	h  *handlers.Handler
-	s  service.Service
-	st storage.Storage
+	ch   *handlers.CatHandler
+	mh   *handlers.MissionHandler
+	cs   service.Service
+	cst  storage.Storage
+	ms   storage.MissionStorage
+	msvc service.MissionService
 }
 
 func New() (*App, error) {
@@ -24,16 +28,27 @@ func New() (*App, error) {
 	}
 
 	a := &App{}
-	st, err := storage.New(connStr)
+	
+
+	db := database.DB(connStr)
+	mst_ := storage.NewMissionStorage(db)
+
+	//Cat
+	st, err := storage.New(db)
 	if err != nil {
 		return nil, err
 	}
+	a.cst = st
 
-	a.st = st
+	a.cs = service.New(a.cst)
 
-	a.s = service.New(a.st)
+	a.ch = handlers.New(a.cs)
 
-	a.h = handlers.New(a.s)
+	//Mission
+
+	a.ms = *mst_
+	a.msvc = *service.NewMissionService(a.ms)
+	a.mh = handlers.NewMissionHandler(a.msvc)
 
 	return a, nil
 }
@@ -43,7 +58,8 @@ func (a *App) Run() error {
 
 	router := gin.Default()
 
-	a.h.RegisterRoutes(router)
+	a.ch.RegisterRoutes(router)
+	a.mh.RegisterRoutesM(router)
 
 	err := router.Run(":8080")
 	if err != nil {

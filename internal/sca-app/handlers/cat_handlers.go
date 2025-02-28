@@ -9,17 +9,17 @@ import (
 	"github.com/rvxt21/sca-agency/internal/sca-app/service"
 )
 
-type Handler struct {
+type CatHandler struct {
 	s service.Service
 }
 
-func New(s service.Service) *Handler {
-	return &Handler{
+func New(s service.Service) *CatHandler {
+	return &CatHandler{
 		s: s,
 	}
 }
 
-func (h *Handler) CreateSpyCat(c *gin.Context) {
+func (h *CatHandler) CreateSpyCat(c *gin.Context) {
 	var cat models.SpyCat
 
 	if err := c.ShouldBindJSON(&cat); err != nil {
@@ -36,7 +36,7 @@ func (h *Handler) CreateSpyCat(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Spy cat created successfully"})
 }
 
-func (h *Handler) DeleteSpyCat(c *gin.Context) {
+func (h *CatHandler) DeleteSpyCat(c *gin.Context) {
 	id := c.Value("id").(uint)
 
 	if err := h.s.DeleteSpyCat(id); err != nil {
@@ -52,7 +52,7 @@ type UpdateSalaryReq struct {
 	salary float64 `json:"salary"`
 }
 
-func (h *Handler) UpdateSpyCat(c *gin.Context) {
+func (h *CatHandler) UpdateSpyCat(c *gin.Context) {
 	var req UpdateSalaryReq
 
 	id := c.Value("id").(uint)
@@ -72,7 +72,7 @@ func (h *Handler) UpdateSpyCat(c *gin.Context) {
 
 }
 
-func (h *Handler) GetAllSpyCats(c *gin.Context) {
+func (h *CatHandler) GetAllSpyCats(c *gin.Context) {
 	cats, err := h.s.GetAllSpyCats()
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to retrieve all spy cats")
@@ -83,7 +83,7 @@ func (h *Handler) GetAllSpyCats(c *gin.Context) {
 	c.JSON(http.StatusOK, cats)
 }
 
-func (h *Handler) GetSpyCatById(c *gin.Context) {
+func (h *CatHandler) GetSpyCatById(c *gin.Context) {
 	id := c.Value("id").(uint)
 
 	cat, err := h.s.GetSpyCat(id)

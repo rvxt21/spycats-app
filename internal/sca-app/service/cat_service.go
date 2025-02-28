@@ -4,7 +4,18 @@ import (
 	"fmt"
 
 	"github.com/rvxt21/sca-agency/internal/sca-app/models"
+	"github.com/rvxt21/sca-agency/internal/sca-app/storage"
 )
+
+type CatService struct {
+	storage storage.Storage
+}
+
+func New(s storage.Storage) *CatService {
+	return &CatService{
+		storage: s,
+	}
+}
 
 func (s *CatService) CreateSpyCat(spyCat *models.SpyCat) error {
 	err := s.storage.CreateSpyCat(spyCat)

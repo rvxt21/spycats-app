@@ -12,10 +12,21 @@ type SpyCat struct {
 
 type Mission struct {
 	ID          uint `gorm:"primaryKey"`
-	CatID       uint `gorm:"uniqueIndex"`
+	CatID       uint `json:"cat_id" gorm:"uniqueIndex"`
 	IsCompleted bool `gorm:"default:false"`
 
 	Targets []Target `gorm:"foreignKey:MissionID"`
+}
+
+func (m *Mission) CheckTargetsUnique() bool {
+	targetNames := make(map[string]bool)
+	for _, target := range m.Targets {
+		if _, exists := targetNames[target.Name]; exists {
+			return false
+		}
+		targetNames[target.Name] = true
+	}
+	return true
 }
 
 type Target struct {

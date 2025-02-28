@@ -5,7 +5,7 @@ import (
 	"github.com/rvxt21/sca-agency/internal/sca-app/middlewares"
 )
 
-func (h *Handler) RegisterRoutes(router *gin.Engine) {
+func (h *CatHandler) RegisterRoutes(router *gin.Engine) {
 
 	spyCatGroup := router.Group("/spycats")
 	{
@@ -16,4 +16,9 @@ func (h *Handler) RegisterRoutes(router *gin.Engine) {
 		spyCatGroup.GET("/:id", middlewares.IdMiddleware(), h.GetSpyCatById)
 	}
 
+}
+
+func (h *MissionHandler) RegisterRoutesM(router *gin.Engine) {
+	missionGroup := router.Group("/missions")
+	missionGroup.POST("/", h.CreateMission)
 }
