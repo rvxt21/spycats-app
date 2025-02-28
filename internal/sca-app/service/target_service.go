@@ -29,3 +29,11 @@ func (s *TargetsService) DeleteTarget(missionId, targetId uint) error {
 	}
 	return nil
 }
+
+func (s *TargetsService) UpdateNotes(missionId, targetId uint, notes string) error {
+	if err := s.st.UpdateNotes(missionId, targetId, notes); err != nil {
+		return err
+	}
+	return nil
+
+}

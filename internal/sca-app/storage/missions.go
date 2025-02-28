@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/rvxt21/sca-agency/internal/sca-app/models"
@@ -41,10 +42,25 @@ func (s *MissionStorage) DeleteMission(id uint) error {
 	return nil
 }
 
-func (s *MissionStorage) UpdateMissionStatus(id uint, isComplited bool) error {
-	if err := s.db.Model(&models.Mission{}).Where("id = ?", id).Update("is_complited", isComplited).Error; err != nil {
-		return fmt.Errorf("failed to update mission status: %v", err)
+func (s *MissionStorage) UpdateMissionStatus(id uint, isCompleted bool) error {
+	var mission models.Mission
+	err := s.db.Where("id = ?", id).First(&mission).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("mission with ID %d not found", id)
+		}
+		return fmt.Errorf("failed to fetch mission: %w", err)
 	}
+	if mission.IsCompleted {
+		return fmt.Errorf("cannot update status for completed mission")
+	}
+
+	mission.IsCompleted = isCompleted
+
+	if err := s.db.Save(&mission).Error; err != nil {
+		return fmt.Errorf("failed to update mission status: %w", err)
+	}
+
 	return nil
 }
 
@@ -88,4 +104,3 @@ func (s *MissionStorage) SetCat(missionId, catId uint) error {
 
 	return nil
 }
-

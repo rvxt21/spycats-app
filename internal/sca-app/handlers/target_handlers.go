@@ -57,8 +57,31 @@ func (h *TargetsHandler) DeleteTarget(c *gin.Context) {
 
 	if err := h.s.DeleteTarget(mission_id, req.TargetId); err != nil {
 		log.Error().Err(err).Msg("Failed to delete target")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusNoContent, "Mission deleted")
+}
+
+type UpdateNotesReq struct {
+	TargetId uint `json:"target_id"`
+	Notes    string
+}
+
+func (h *TargetsHandler) UpdateNotes(c *gin.Context) {
+	mission_id := c.Value("id").(uint)
+
+	var req UpdateNotesReq
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	if err := h.s.UpdateNotes(mission_id, req.TargetId, req.Notes); err != nil {
+		log.Error().Err(err).Msg("Failed to delete target")
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusAccepted, "Notes updated successfully")
 }

@@ -47,7 +47,7 @@ func (h *MissionHandler) DeleteMission(c *gin.Context) {
 }
 
 type UpdateMissionStatusReqBody struct {
-	IsCompleted bool `json:"is_complited"`
+	IsCompleted bool `json:"is_completed"`
 }
 
 func (h *MissionHandler) UpdateMissionStatus(c *gin.Context) {

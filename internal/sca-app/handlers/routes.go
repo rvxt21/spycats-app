@@ -31,7 +31,8 @@ func (h *MissionHandler) RegisterRoutesM(router *gin.Engine) {
 }
 
 func (h *TargetsHandler) RegisterRoutesT(router *gin.Engine) {
-	targetGroup := router.Group("/targets")
+	targetGroup := router.Group("/missions/:id/targets")
 	targetGroup.POST("/", middlewares.IdMiddleware(), h.AddTargetToMission)
-	targetGroup.DELETE("/", middlewares.IdMiddleware(), h.DeleteTarget)
+	targetGroup.DELETE("/deletetarget", middlewares.IdMiddleware(), h.DeleteTarget)
+	targetGroup.PATCH("/updatenotes", middlewares.IdMiddleware(), h.UpdateNotes)
 }

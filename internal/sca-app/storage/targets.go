@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/rvxt21/sca-agency/internal/sca-app/models"
@@ -65,7 +66,26 @@ func (s *TargetsStorage) DeleteTarget(missionId, targetId uint) error {
 	return nil
 }
 
+func (s *TargetsStorage) UpdateNotes(missionId, targetId uint, notes string) error {
+	var target models.Target
 
-func (s *TargetsStorage) UpdateNotes(missionId, targetId uint, notes string) error{
-	
-}	
+	err := s.db.Where("id = ? AND mission_id = ?", targetId, missionId).First(&target).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("target with ID %d not found in mission %d", targetId, missionId)
+		}
+		return fmt.Errorf("failed to fetch target: %w", err)
+	}
+
+	if target.IsCompleted {
+		return fmt.Errorf("cannot update notes for completed target")
+	}
+
+	target.Notes = notes
+
+	if err := s.db.Save(&target).Error; err != nil {
+		return fmt.Errorf("failed to update notes: %w", err)
+	}
+
+	return nil
+}
