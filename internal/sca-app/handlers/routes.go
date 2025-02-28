@@ -35,4 +35,5 @@ func (h *TargetsHandler) RegisterRoutesT(router *gin.Engine) {
 	targetGroup.POST("/", middlewares.IdMiddleware(), h.AddTargetToMission)
 	targetGroup.DELETE("/deletetarget", middlewares.IdMiddleware(), h.DeleteTarget)
 	targetGroup.PATCH("/updatenotes", middlewares.IdMiddleware(), h.UpdateNotes)
+	targetGroup.PATCH("/updatestatus", middlewares.IdMiddleware(), h.UpdateTargerStatus)
 }

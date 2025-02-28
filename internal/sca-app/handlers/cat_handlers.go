@@ -97,7 +97,7 @@ func (h *CatHandler) GetSpyCatById(c *gin.Context) {
 	cat, err := h.s.GetSpyCat(id)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to retrieve spy cat by ID")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve spy cat"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

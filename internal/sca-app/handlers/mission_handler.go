@@ -40,7 +40,7 @@ func (h *MissionHandler) DeleteMission(c *gin.Context) {
 
 	if err := h.s.DeleteMission(id); err != nil {
 		log.Error().Err(err).Msg("Failed to delete mission")
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusNoContent, "Mission deleted")
@@ -61,7 +61,7 @@ func (h *MissionHandler) UpdateMissionStatus(c *gin.Context) {
 
 	if err := h.s.UpdateMissionStatus(id, req.IsCompleted); err != nil {
 		log.Error().Err(err).Msg("Failed to update mission status")
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

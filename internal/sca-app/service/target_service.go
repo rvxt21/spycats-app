@@ -37,3 +37,11 @@ func (s *TargetsService) UpdateNotes(missionId, targetId uint, notes string) err
 	return nil
 
 }
+
+func (s *TargetsService) UpdateTargerStatus(missionId, targetId uint, isCompleted bool) error {
+	if err := s.st.UpdateTargerStatus(missionId, targetId, isCompleted); err != nil {
+		return err
+	}
+	return nil
+
+}

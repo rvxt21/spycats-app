@@ -89,3 +89,24 @@ func (s *TargetsStorage) UpdateNotes(missionId, targetId uint, notes string) err
 
 	return nil
 }
+
+func (s *TargetsStorage) UpdateTargerStatus(missionId, targetId uint, is_completed bool) error {
+	var target models.Target
+
+	err := s.db.Where("id = ? AND mission_id = ?", targetId, missionId).First(&target).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("target with ID %d not found in mission %d", targetId, missionId)
+		}
+		return fmt.Errorf("failed to fetch target: %w", err)
+	}
+
+	target.IsCompleted = is_completed
+
+	if err := s.db.Save(&target).Error; err != nil {
+		return fmt.Errorf("failed to update status: %w", err)
+	}
+
+	return nil
+
+}
